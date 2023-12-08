@@ -1,0 +1,119 @@
+<!-- music_player_layout.xml -->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/black">
+
+    <ImageView
+        android:id="@+id/albumArtImageView"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="32dp"
+        android:src="@drawable/ic_launcher_foreground"
+        android:contentDescription="@string/album_art_description" />
+    <TextView
+        android:id="@+id/songTitleTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:ellipsize="marquee"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:scrollHorizontally="true"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:layout_below="@id/albumArtImageView"
+        android:layout_marginTop="32dp"
+        android:gravity="center_horizontal"
+        android:text="@string/default_song_title"
+        android:textColor="@color/white"
+        android:textSize="48sp" />
+
+    <TextView
+        android:id="@+id/artistTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:ellipsize="marquee"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:scrollHorizontally="true"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:layout_below="@id/songTitleTextView"
+        android:layout_marginTop="16dp"
+        android:gravity="center_horizontal"
+        android:text="@string/default_artist"
+        android:textSize="24sp"
+        android:textColor="@color/white"/>
+    <TextView
+        android:id="@+id/infoTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:ellipsize="marquee"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:scrollHorizontally="true"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:layout_below="@id/artistTextView"
+        android:layout_marginTop="16dp"
+        android:gravity="center_horizontal"
+        android:text=""
+        android:textSize="24sp"
+        android:textColor="@color/white"/>
+    <TextView
+        android:id="@+id/timeTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/infoTextView"
+        android:layout_marginTop="16dp"
+        android:gravity="center_horizontal"
+        android:text="00:00"
+        android:textSize="24sp"
+        android:textColor="@color/white"/>
+    <SeekBar
+        android:id="@+id/seekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/timeTextView"
+        android:layout_marginTop="32dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/seekBar"
+        android:layout_marginTop="16dp"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/prevButton"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_marginEnd="16dp"
+            android:background="?android:selectableItemBackground"
+            android:src="@drawable/ic_skip_previous"
+            app:tint="@android:color/white"/>
+
+        <ImageButton
+            android:id="@+id/playPauseButton"
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:background="?android:selectableItemBackground"
+            android:src="@drawable/ic_pause"
+            app:tint="@android:color/white"/>
+
+        <ImageButton
+            android:id="@+id/nextButton"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_marginStart="16dp"
+            android:background="?android:selectableItemBackground"
+            android:src="@drawable/ic_skip_next"
+            app:tint="@android:color/white"/>
+    </LinearLayout>
+</RelativeLayout>

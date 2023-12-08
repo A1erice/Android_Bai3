@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">My Application 2</string>
+    <string name="backButton">Back</string>
+    <string name="pickButton">Pick</string>
+    <string name="exitButton">Exit</string>
+    <string name="album_art_description">This song has no description</string>
+    <string name="default_song_title">Song name</string>
+    <string name="default_artist">Unknow artist</string>
+</resources>
