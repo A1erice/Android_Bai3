@@ -1,18 +1,21 @@
 package com.example.myapplication2;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.Image;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.tag.FieldKey;
@@ -20,38 +23,72 @@ import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.images.Artwork;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import java.io.File;
+import java.util.List;
 import java.util.Objects;
 
 public class MusicPlayerActivity extends AppCompatActivity {
 
+    private static final int UPDATE_PROGRESS = 1;
     private MediaPlayer mediaPlayer;
     private ImageButton playPauseButton;
     private TextView durationTextView;
     private Handler handler;
     private SeekBar seekBar;
-    private static final int UPDATE_PROGRESS = 1;
+    private String path;
+    private String currentFolderPath;
+    private File file;
+    private File[] files;
+    private int index = 0, total = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
 
         // Retrieve file path using the correct key
-        String path = getIntent().getStringExtra("file");
-        System.out.println(path);
-        // Initialize UI components
-        playPauseButton = findViewById(R.id.playPauseButton);
+        path = getIntent().getStringExtra("file");
+        durationTextView = findViewById(R.id.timeTextView);
         seekBar = findViewById(R.id.seekBar);
-        // Get metadata
-        getMetadata(path);
+        playPauseButton = findViewById(R.id.playPauseButton);
+        currentFolderPath = new File(path).getParent();
+        file = new File(path);
+        if (file.isDirectory()) {
+            // If the input path is a directory, play all songs in that folder
+            files = file.listFiles();
+            total = files.length;
+            playSingleSongList();
+        } else {
+            // If the input path is a file, play only that song
+            playSingleSong(file);
+        }
+        // Set other listeners and controls as needed
+    }
+    private void playSingleSong(File file) {
+        // Start playing the specified song
+        playSong(file.getPath());
+    }
+    private void playSingleSongList() {
+        System.out.println("playing"+ path);
+        playSong(files[index].getPath());
+        index += 1;
+    }
+    private void playSong(String filePath) {
+        getMetadata(filePath);
         // Initialize MediaPlayer
-        mediaPlayer = MediaPlayer.create(this, Uri.parse(path));
-        mediaPlayer.setOnCompletionListener(mp -> playPauseButton.setImageResource(R.drawable.ic_play));
+        mediaPlayer = MediaPlayer.create(this, Uri.parse(filePath));
+        mediaPlayer.setOnCompletionListener(mp -> {
+            if (total == 1 || index == total) getBack();
+            else {
+                playSingleSongList();
+            }
+        });
         mediaPlayer.start();
+
         // Get duration
         seekBar.setMax(mediaPlayer.getDuration());
-        durationTextView = findViewById(R.id.timeTextView);
         handler = new Handler(msg -> {
             if (msg.what == UPDATE_PROGRESS) {
                 updateSeekBar();
@@ -100,10 +137,8 @@ public class MusicPlayerActivity extends AppCompatActivity {
                 // Not needed for this example
             }
         });
-
-        // Set other listeners and controls as needed
+        // ... (rest of your code)
     }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -131,10 +166,10 @@ public class MusicPlayerActivity extends AppCompatActivity {
         int totalSeconds = duration / 1000;
         int totalMinutes = totalSeconds / 60;
         totalSeconds = totalSeconds % 60;
-
         // Update the durationTextView with the formatted time
         durationTextView.setText(String.format("%02d:%02d / %02d:%02d", currentMinutes, currentSeconds, totalMinutes, totalSeconds));
     }
+    @SuppressLint("SetTextI18n")
     public void getMetadata(String filePath) {
         try {
             // Read the audio file
@@ -174,5 +209,18 @@ public class MusicPlayerActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+    public void getBack() {
+        if (!isFinishing() && !isDestroyed()) {
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.putExtra("fromPlayer", true);
+            intent.putExtra("path", currentFolderPath); // Pass the current folder path to MainActivity
+            startActivity(intent);
+        }
+    }
+
+
+
+
+
 
 }

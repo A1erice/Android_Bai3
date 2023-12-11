@@ -5,16 +5,14 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
-import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-
-import com.google.android.material.button.MaterialButton;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,38 +26,47 @@ public class MainActivity extends AppCompatActivity {
         toolbar.setTitle("My Music Player");
         setSupportActionBar(toolbar);
 
-        Button storageBtn = findViewById(R.id.openButton);
-        storageBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(checkPermission()){
-                    //permission allowed
-                    Intent intent = new Intent(MainActivity.this, FileListActivity.class);
-                    String path = Environment.getExternalStorageDirectory().getPath();
-                    intent.putExtra("path",path);
-                    startActivity(intent);
-                }else{
-                    //permission not allowed
-                    requestPermission();
-                }
+        // Check and request permission if needed
+        if (checkPermission()) {
+            // Check if the activity was started from the player
+            Intent intent = getIntent();
+            if (intent != null && intent.getBooleanExtra("fromPlayer", false)) {
+                // The activity was started from the player, retrieve the path from the intent
+                String path = intent.getStringExtra("path");
+                openFileListFragment(path);
+            } else {
+                // The activity was not started from the player, open the default fragment
+                String path = Environment.getExternalStorageDirectory().getPath();
+                openFileListFragment(path);
             }
-        });
+        } else {
+            // Permission not allowed, request permission
+            requestPermission();
+        }
     }
-    private boolean checkPermission(){
+
+    private boolean checkPermission() {
         int result = ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        if(result == PackageManager.PERMISSION_GRANTED){
-            return true;
-        }else {
-            return false;
+        return result == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void requestPermission() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            Toast.makeText(MainActivity.this, "Storage permission is required, please allow from settings", Toast.LENGTH_SHORT).show();
+        } else {
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 111);
         }
     }
-    private void requestPermission(){
-        if(ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,Manifest.permission.WRITE_EXTERNAL_STORAGE)){
-            Toast.makeText(MainActivity.this,"Storage permission is requires,please allow from settings",Toast.LENGTH_SHORT).show();
-            System.out.println("3");
-        }else {
-            System.out.println("4");
-            ActivityCompat.requestPermissions(MainActivity.this,new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE},111);
-        }
+
+    private void openFileListFragment(String path) {
+        // Create a new instance of FileListFragment with the specified path
+        FileListFragment fileListFragment = FileListFragment.newInstance(path);
+
+        // Replace the current fragment with FileListFragment
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.fragment_container, fileListFragment); // R.id.fragment_container is the ID of the container where the fragment will be placed
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 }

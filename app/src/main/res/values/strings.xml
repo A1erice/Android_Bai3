@@ -6,4 +6,5 @@
     <string name="album_art_description">This song has no description</string>
     <string name="default_song_title">Song name</string>
     <string name="default_artist">Unknow artist</string>
+    <string name="time">00:00</string>
 </resources>
